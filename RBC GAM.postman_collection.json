@@ -1,0 +1,200 @@
+{
+	"info": {
+		"_postman_id": "2f348e8c-57df-42fb-86ff-aa01a9868e7f",
+		"name": "RBC GAM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "New Fin Instrument",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 0,\r\n    \"price\": 14.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44399/api/FinancialInstrument/NewInstrument",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"FinancialInstrument",
+						"NewInstrument"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Fin Inst",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44399/api/FinancialInstrument/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"FinancialInstrument",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"id\" : 0,\r\n   \"name\": \"aruna\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44399/api/user",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44399/api/user/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"user",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy Instrument",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":1,\r\n    \"finInstrumentId\": 1,\r\n    \"thresholds\": [\r\n        {\r\n            \"id\": 0,\r\n            \"finInstrumentId\": 1,\r\n            \"userId\": 1,\r\n            \"triggers\": [\r\n                {\r\n                    \"id\":0,\r\n                    \"action\":\"Buy\",\r\n                    \"thresholdId\": 0,\r\n                    \"price\": 14.25,\r\n                    \"direction\": \"Above\",\r\n                    \"fluctuation\": 0.02\r\n                },\r\n                {\r\n                    \"id\":0,\r\n                    \"action\":\"Sell\",\r\n                    \"thresholdId\": 0,\r\n                    \"price\": 14.28,\r\n                    \"direction\": \"Below\",\r\n                    \"fluctuation\": 0.02\r\n                }\r\n            ]\r\n        }\r\n\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44399/api/FinancialInstrument/buyinstrument",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"FinancialInstrument",
+						"buyinstrument"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Price",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":1,\r\n    \"userId\":1,\r\n    \"price\": 14.28\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44399/api/FinancialInstrument/setprice",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"FinancialInstrument",
+						"setprice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sell Instrument",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"finInstrumentId\" : 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44399/api/FinancialInstrument/SellInstrument",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44399",
+					"path": [
+						"api",
+						"FinancialInstrument",
+						"SellInstrument"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
