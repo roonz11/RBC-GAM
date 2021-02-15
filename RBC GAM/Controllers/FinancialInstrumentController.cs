@@ -50,8 +50,8 @@ namespace RBC_GAM.Controllers
         public async Task<IActionResult> NewInstrument([FromBody] FinInstrumentDTO finInst)
         {
             var result = await _financialInstrumentRepository.NewFinancialInstrument(finInst);
-            if (result)
-                return Ok();
+            if (result > 0)
+                return Ok(result);
             else
                 return BadRequest("Could not add new Financial Instrument");
         }

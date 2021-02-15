@@ -90,7 +90,7 @@ namespace RBC_GAM.Repositories
             return false;
         }
 
-        public async Task<bool> NewFinancialInstrument(FinInstrumentDTO finInst)
+        public async Task<int> NewFinancialInstrument(FinInstrumentDTO finInst)
         {
             var dbFinInst = await _dbContext.FinancialInstrument
                                 .SingleOrDefaultAsync(x => x.Id == finInst.Id);
@@ -100,10 +100,10 @@ namespace RBC_GAM.Repositories
                 return await AddFinancialInstrument(finInst);
             }
 
-            return false;
+            return -1;
         }
 
-        private async Task<bool> AddFinancialInstrument(FinInstrumentDTO price)
+        private async Task<int> AddFinancialInstrument(FinInstrumentDTO price)
         {
             var dbFinInst = new FinancialInstrument
             {
@@ -111,11 +111,7 @@ namespace RBC_GAM.Repositories
             };
 
             await _dbContext.AddAsync(dbFinInst);
-            var result = await _dbContext.SaveChangesAsync();
-            if (result > 0)
-                return true;
-
-            return false;
+            return await _dbContext.SaveChangesAsync();            
         }
 
         private async Task<bool> AddUserToFinancialInstrumentAsync(int finId, int userId)

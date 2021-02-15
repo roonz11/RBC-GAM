@@ -7,7 +7,7 @@ namespace RBC_GAM.Repositories
 {
     public interface IFinancialInstrumentRepository
     {
-        Task<bool> NewFinancialInstrument(FinInstrumentDTO price);
+        Task<int> NewFinancialInstrument(FinInstrumentDTO price);
         Task<FinancialInstrument> GetFinancialInstrument(int id);
         Task<List<FinancialInstrument>> GetFinancialInstruments();
         Task<bool> BuyFinancialInstrument(UserDTO user);
