@@ -12,8 +12,6 @@ namespace RBC_GAM.Repositories
         Task<List<FinancialInstrument>> GetFinancialInstruments();
         Task<bool> BuyFinancialInstrument(UserDTO user);
         Task<bool> SellFinancialInstrument(UserDTO user);
-        Task<bool> UpdatePrice(FinInstrumentDTO finInst);
-        Task<double> GetPrice(int id);
-        Task NotifyUsers(double prevPrice, int finIstId);
+        Task<bool> UpdatePrice(FinInstrumentDTO finInst);                
     }
 }

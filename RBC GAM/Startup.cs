@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RBC_GAM.Data;
 using RBC_GAM.Repositories;
+using RBC_GAM.Services;
 
 namespace RBC_GAM
 {
@@ -24,6 +25,7 @@ namespace RBC_GAM
             services.AddDbContext<FinInstContext>(options => options.UseSqlite("Data Source=finanicalInstrument.db"));
             services.AddScoped<IFinancialInstrumentRepository, FinancialInstrumentRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<INotificationService, NotificationService>();
             services.AddControllers();
             services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapping>(), typeof(Startup));
         }
