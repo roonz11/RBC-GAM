@@ -7,7 +7,7 @@ namespace RBC_GAM_Tests
 {
     public abstract class TestWithSqlLite : IDisposable
     {
-        private const string InMemoryCnnectionString = "DataSource=:memory:";
+        private const string InMemoryCnnectionString = "Data Source=finanicalInstrument.db";
         private readonly SqliteConnection _sqliteConnection;
         protected readonly FinInstContext _dbContext;
 
