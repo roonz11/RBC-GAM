@@ -22,16 +22,22 @@ namespace RBC_GAM
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<FinInstContext>(options => options.UseSqlite("Data Source=finanicalInstrument.db"));
+            ConfigureDatabaseServices(services);
             services.AddScoped<IFinancialInstrumentRepository, FinancialInstrumentRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITriggerRepository, TriggerRepository>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddControllers();
             services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapping>(), typeof(Startup));
         }
 
+        protected virtual void ConfigureDatabaseServices(IServiceCollection services)
+        {
+            services.AddDbContext<FinInstContext>(options => options.UseSqlite("Data Source=finanicalInstrument.db"));
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

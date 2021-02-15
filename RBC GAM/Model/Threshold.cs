@@ -21,6 +21,7 @@ namespace RBC_GAM.Model
         public double Price { get; set; }
         public Direction Direction { get; set; }
         public double Fluctuation { get; set; }
+        public bool HasBeenHit { get; set; }
     }
 
     public enum Action

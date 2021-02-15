@@ -1,13 +1,12 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RBC_GAM.Data;
 using RBC_GAM.Model;
 using RBC_GAM.ModelDTO;
+using RBC_GAM.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RBC_GAM.Services
@@ -15,30 +14,51 @@ namespace RBC_GAM.Services
     public class NotificationService : INotificationService
     {
         private readonly FinInstContext _dbContext;
+        private readonly ITriggerRepository _triggerRepository;
         private readonly ILogger<NotificationService> _logger;
 
         public NotificationService(FinInstContext dbContext,
+                                   ITriggerRepository triggerRepository,
                                    ILogger<NotificationService> logger)
         {
             _dbContext = dbContext;
+            _triggerRepository = triggerRepository;
             _logger = logger;
         }
         public async Task NotifyUsers(double prevPrice, int finIstId)
         {
             var userBuyAbove = await UsersBuyAbove(prevPrice, finIstId);
-            foreach (var u in userBuyAbove)
-                DisplayNotification(u);
-
+            if(userBuyAbove.Count > 0)
+            {
+                DisplayNotification(userBuyAbove);
+                await UpdateTriggers(userBuyAbove);
+            }
+            
             var userBuyBelow = await UsersBuyBelow(prevPrice, finIstId);
-            foreach (var u in userBuyBelow)
-                DisplayNotification(u);
+            if(userBuyBelow.Count > 0)
+            {
+                DisplayNotification(userBuyBelow);
+                await UpdateTriggers(userBuyBelow);
+            }
 
             var userSellAbove = await UsersSellAbove(prevPrice, finIstId);
-            foreach (var u in userSellAbove)
-                DisplayNotification(u);
+            if(userSellAbove.Count > 0)
+            {
+                DisplayNotification(userSellAbove);
+                await UpdateTriggers(userSellAbove);
+            }
 
             var userSellBelow = await UsersSellBelow(prevPrice, finIstId);
-            foreach (var u in userSellBelow)
+            if(userSellBelow.Count > 0)
+            {
+                DisplayNotification(userSellBelow);
+                await UpdateTriggers(userSellBelow);
+            }
+        }
+
+        private void DisplayNotification(List<UserNotification> users)
+        {
+            foreach (var u in users)
                 DisplayNotification(u);
         }
 
@@ -50,11 +70,19 @@ namespace RBC_GAM.Services
             _logger.LogInformation($"prev Price: {user.PrevPrice}");
             _logger.LogInformation($"current Price: {user.CurrentPrice}");
             _logger.LogInformation("Trigger:");
+            _logger.LogInformation($"        Id: {user.TriggerInfo.Id}");
             _logger.LogInformation($"        Action: {user.TriggerInfo.Action}");
             _logger.LogInformation($"        Price: {user.TriggerInfo.Price}");
             _logger.LogInformation($"        Direction: {user.TriggerInfo.Direction}");
             _logger.LogInformation($"        Fluctuation: {user.TriggerInfo.Fluctuation}");
+            _logger.LogInformation($"        HasBeenHitAlready: {(user.TriggerInfo.HasBeenHit ? "Yes" : "No")}");
             _logger.LogInformation("--------------------------");
+        }
+
+        private async Task UpdateTriggers(List<UserNotification> users)
+        {
+            var triggersToUpdate = users.Where(x => !x.TriggerInfo.HasBeenHit).Select(x => x.TriggerInfo.Id).ToArray();
+            await _triggerRepository.UpdateTriggersThatHaveBeenHit(triggersToUpdate);
         }
 
         /// <summary>
@@ -72,7 +100,7 @@ namespace RBC_GAM.Services
                      join tr in _dbContext.Trigger on th.Id equals tr.ThresholdId
                      where f.Id == finIstId
                             && tr.Price >= f.CurrentPrice
-                            && tr.Fluctuation < Math.Abs(prevPrice - f.CurrentPrice)
+                            && (!tr.HasBeenHit || tr.Fluctuation < Math.Abs(prevPrice - f.CurrentPrice))
                             && tr.Direction == Direction.Above
                             && tr.Action == Model.Action.Buy
                      select new UserNotification
@@ -83,10 +111,12 @@ namespace RBC_GAM.Services
                          CurrentPrice = f.CurrentPrice,
                          TriggerInfo = new TriggerDTO
                          {
+                             Id = tr.Id,
                              Action = tr.Action == Model.Action.Buy ? "Buy" : "Sell", //Enum.GetName(typeof(Model.Action), tr.Action),
                              Direction = tr.Direction == Direction.Above ? "Above" : "Below", //Enum.GetName(typeof(Direction), tr.Direction),
                              Fluctuation = tr.Fluctuation,
-                             Price = tr.Price
+                             Price = tr.Price,
+                             HasBeenHit = tr.HasBeenHit
                          }
                      };
 
@@ -108,7 +138,7 @@ namespace RBC_GAM.Services
                      join tr in _dbContext.Trigger on th.Id equals tr.ThresholdId
                      where f.Id == finIstId
                             && tr.Price <= f.CurrentPrice
-                            && tr.Fluctuation < Math.Abs(f.CurrentPrice - prevPrice)
+                            && (!tr.HasBeenHit || tr.Fluctuation < Math.Abs(f.CurrentPrice - prevPrice))
                             && tr.Direction == Direction.Below
                             && tr.Action == Model.Action.Buy
                      select new UserNotification
@@ -120,10 +150,12 @@ namespace RBC_GAM.Services
                          CurrentPrice = f.CurrentPrice,
                          TriggerInfo = new TriggerDTO
                          {
+                             Id = tr.Id,
                              Action = tr.Action == Model.Action.Buy ? "Buy" : "Sell",
                              Direction = tr.Direction == Direction.Above ? "Above" : "Below",
                              Fluctuation = tr.Fluctuation,
-                             Price = tr.Price
+                             Price = tr.Price,
+                             HasBeenHit = tr.HasBeenHit
                          }
                      };
 
@@ -145,7 +177,7 @@ namespace RBC_GAM.Services
                      join tr in _dbContext.Trigger on th.Id equals tr.ThresholdId
                      where f.Id == finIstId
                             && tr.Price >= f.CurrentPrice
-                            && tr.Fluctuation < Math.Abs(f.CurrentPrice - prevPrice)
+                            && (!tr.HasBeenHit || tr.Fluctuation < Math.Abs(f.CurrentPrice - prevPrice))
                             && tr.Direction == Direction.Above
                             && tr.Action == Model.Action.Sell
                      select new UserNotification
@@ -157,10 +189,12 @@ namespace RBC_GAM.Services
                          CurrentPrice = f.CurrentPrice,
                          TriggerInfo = new TriggerDTO
                          {
+                             Id = tr.Id,
                              Action = tr.Action == Model.Action.Buy ? "Buy" : "Sell",
                              Direction = tr.Direction == Direction.Above ? "Above" : "Below",
                              Fluctuation = tr.Fluctuation,
-                             Price = tr.Price
+                             Price = tr.Price,
+                             HasBeenHit = tr.HasBeenHit
                          }
                      };
 
@@ -182,7 +216,7 @@ namespace RBC_GAM.Services
                      join tr in _dbContext.Trigger on th.Id equals tr.ThresholdId
                      where f.Id == finIstId
                             && tr.Price <= f.CurrentPrice
-                            && tr.Fluctuation < Math.Abs(f.CurrentPrice - prevPrice)
+                            && (!tr.HasBeenHit || tr.Fluctuation < Math.Abs(f.CurrentPrice - prevPrice))
                             && tr.Direction == Direction.Below
                             && tr.Action == Model.Action.Sell
                      select new UserNotification
@@ -194,10 +228,12 @@ namespace RBC_GAM.Services
                          CurrentPrice = f.CurrentPrice,
                          TriggerInfo = new TriggerDTO
                          {
+                             Id = tr.Id,
                              Action = tr.Action == Model.Action.Buy ? "Buy" : "Sell",
                              Direction = tr.Direction == Direction.Above ? "Above" : "Below",
                              Fluctuation = tr.Fluctuation,
-                             Price = tr.Price
+                             Price = tr.Price,
+                             HasBeenHit = tr.HasBeenHit
                          }
                      };
 

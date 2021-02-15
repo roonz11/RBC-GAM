@@ -18,5 +18,6 @@ namespace RBC_GAM.ModelDTO
         public double Price { get; set; }
         public string Direction { get; set; }
         public double Fluctuation { get; set; }
+        public bool HasBeenHit { get; set; }
     }
 }

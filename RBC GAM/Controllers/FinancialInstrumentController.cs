@@ -49,11 +49,18 @@ namespace RBC_GAM.Controllers
         [HttpPost("NewInstrument")]
         public async Task<IActionResult> NewInstrument([FromBody] FinInstrumentDTO finInst)
         {
-            var result = await _financialInstrumentRepository.NewFinancialInstrument(finInst);
-            if (result > 0)
-                return Ok(result);
-            else
-                return BadRequest("Could not add new Financial Instrument");
+            try
+            {
+                var result = await _financialInstrumentRepository.NewFinancialInstrument(finInst);
+                if (result > 0)
+                    return Ok(result);
+                else
+                    return BadRequest("Could not add new Financial Instrument");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("BuyInstrument")]
