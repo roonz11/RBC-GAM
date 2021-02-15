@@ -18,7 +18,7 @@ namespace RBC_GAM.Controllers
         {
             _userRepository = userRepository;
         }
-        // GET: api/<UserController>
+        
         [HttpGet("{id}")]
 
         public async Task<IActionResult> Get(int id)
@@ -44,15 +44,21 @@ namespace RBC_GAM.Controllers
             }
         }
 
-        // POST api/<UserController>
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] User user)
         {
-            var result = await _userRepository.AddAsync(user);
-            if (result)
-                return Ok();
-            else
-                return BadRequest();
+            try
+            {
+                var result = await _userRepository.AddAsync(user);
+                if (result > 0)
+                    return Ok(result);
+                else
+                    return BadRequest("Could not add user");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
     }

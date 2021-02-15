@@ -39,11 +39,18 @@ namespace RBC_GAM.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await _financialInstrumentRepository.GetFinancialInstrument(id);
-            if (result != null)
-                return Ok(result);
-            else
-                return NotFound("Could not find Financial Instrument");
+            try
+            {
+                var result = await _financialInstrumentRepository.GetFinancialInstrument(id);
+                if (result != null)
+                    return Ok(result);
+                else
+                    return NotFound("Could not find Financial Instrument");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("NewInstrument")]
@@ -66,11 +73,18 @@ namespace RBC_GAM.Controllers
         [HttpPost("BuyInstrument")]
         public async Task<IActionResult> BuyInstrument([FromBody] UserDTO user)
         {
-            var result = await _financialInstrumentRepository.BuyFinancialInstrument(user);
-            if (result)
-                return Ok();
-            else
-                return BadRequest("Could not buy new Financial Instrument");
+            try
+            {
+                var result = await _financialInstrumentRepository.BuyFinancialInstrument(user);
+                if (result)
+                    return Ok(result);
+                else
+                    return BadRequest("Could not buy new Financial Instrument");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("SellInstrument")]

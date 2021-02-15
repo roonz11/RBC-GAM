@@ -12,6 +12,13 @@ namespace RBC_GAM.Data
     {
         public AutoMapping()
         {
+            CreateMap<FinancialInstrument, FinInstrumentDTO>()
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.CurrentPrice))                
+            .ReverseMap()
+                .ForMember(dest => dest.CurrentPrice, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.FinancialInstrumentUsers, opt => opt.Ignore())
+                ;
+
             CreateMap<User, UserDTO>()
                 .ForMember(dest => dest.FinInstrumentId, opt => opt.Ignore())
             .ReverseMap();

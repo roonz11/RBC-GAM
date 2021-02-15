@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RBC_GAM.Data;
@@ -28,14 +29,17 @@ namespace RBC_GAM.Repositories
             _mapper = mapper;
         }
 
-        public async Task<FinancialInstrument> GetFinancialInstrument(int id)
+        public async Task<FinInstrumentDTO> GetFinancialInstrument(int id)
         {
-            return await _dbContext.FinancialInstrument.SingleOrDefaultAsync(x => x.Id == id);
+            var dbFinInst = await _dbContext.FinancialInstrument.SingleOrDefaultAsync(x => x.Id == id);
+            return _mapper.Map<FinInstrumentDTO>(dbFinInst);
         }
 
-        public async Task<List<FinancialInstrument>> GetFinancialInstruments()
+        public async Task<List<FinInstrumentDTO>> GetFinancialInstruments()
         {
-            return await _dbContext.FinancialInstrument.ToListAsync();
+            return await _dbContext.FinancialInstrument
+                                    .ProjectTo<FinInstrumentDTO>(_mapper.ConfigurationProvider)
+                                    .ToListAsync();
         }
 
         public async Task<bool> UpdatePrice(FinInstrumentDTO finInst)
@@ -97,21 +101,17 @@ namespace RBC_GAM.Repositories
 
             if (dbFinInst == null)
             {
-                return await AddFinancialInstrument(finInst);
+                dbFinInst = new FinancialInstrument
+                {
+                    CurrentPrice = finInst.Price,
+                };
+
+                await _dbContext.AddAsync(dbFinInst);
+                await _dbContext.SaveChangesAsync();
+                return dbFinInst.Id;
             }
 
             return -1;
-        }
-
-        private async Task<int> AddFinancialInstrument(FinInstrumentDTO price)
-        {
-            var dbFinInst = new FinancialInstrument
-            {
-                CurrentPrice = price.Price,
-            };
-
-            await _dbContext.AddAsync(dbFinInst);
-            return await _dbContext.SaveChangesAsync();            
         }
 
         private async Task<bool> AddUserToFinancialInstrumentAsync(int finId, int userId)

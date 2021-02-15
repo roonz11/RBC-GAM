@@ -10,7 +10,7 @@ namespace RBC_GAM.Repositories
 {
     public interface IUserRepository
     {
-        Task<bool> AddAsync(User user);
+        Task<int> AddAsync(User user);
 
         Task<UserDTO> GetAsync(int id);
         Task<List<UserDTO>> GetAsync();        

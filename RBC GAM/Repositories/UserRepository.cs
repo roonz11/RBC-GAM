@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using RBC_GAM.Data;
 using RBC_GAM.Model;
 using RBC_GAM.ModelDTO;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RBC_GAM.Repositories
@@ -24,17 +22,17 @@ namespace RBC_GAM.Repositories
             _mapper = mapper;
         }
 
-        public async Task<bool> AddAsync(User user)
+        public async Task<int> AddAsync(User user)
         {
             var dbUser = _dbContext.User.SingleOrDefault(x => x.Id == user.Id);
             if (dbUser == null)
             {
                 await _dbContext.AddAsync(user);
                 var result = await _dbContext.SaveChangesAsync();
-                return result > 0;
+                return user.Id;
             }
 
-            return false;
+            return -1;
         }
 
         public async Task<UserDTO> GetAsync(int id)

@@ -8,8 +8,8 @@ namespace RBC_GAM.Repositories
     public interface IFinancialInstrumentRepository
     {
         Task<int> NewFinancialInstrument(FinInstrumentDTO price);
-        Task<FinancialInstrument> GetFinancialInstrument(int id);
-        Task<List<FinancialInstrument>> GetFinancialInstruments();
+        Task<FinInstrumentDTO> GetFinancialInstrument(int id);
+        Task<List<FinInstrumentDTO>> GetFinancialInstruments();
         Task<bool> BuyFinancialInstrument(UserDTO user);
         Task<bool> SellFinancialInstrument(UserDTO user);
         Task<bool> UpdatePrice(FinInstrumentDTO finInst);                
